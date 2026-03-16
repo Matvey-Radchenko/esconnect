@@ -1,6 +1,6 @@
 # ESConnect — автоматизация Endpoint Security VPN
 
-Автоматически подключается к корпоративному Endpoint Security VPN (Check Point Endpoint Security).
+Автоматизация подключения к корпоративному Endpoint Security VPN (Check Point Endpoint Security).
 
 ---
 
