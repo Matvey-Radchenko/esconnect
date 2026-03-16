@@ -1,14 +1,12 @@
 # ESConnect — автоматизация Endpoint Security VPN
 
-Автоматически подключается к корпоративному Endpoint Security VPN (Check Point).
-
-При запросе кода — звонит на телефон через MacroDroid, тот открывает Indeed Key, считывает OTP и отправляет его обратно на Mac.
+Автоматически подключается к корпоративному Endpoint Security VPN (Check Point Endpoint Security).
 
 ---
 
 ## Требования
 
-- macOS (Sequoia и новее)
+- macOS
 - Android-телефон с приложением [MacroDroid](https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid)
 - Приложение **Indeed Key** на телефоне
 
@@ -16,36 +14,48 @@
 
 ## Установка
 
-### 1. Mac
+### 0. Загружаем проект
 
 ```bash
 git clone <repository-url>
 cd esconnect
+```
+
+### 1. Телефон
+
+1. Установить [MacroDroid](https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid)
+2. Импортировать файл `Indeed_Key_HTTP.macro` из папки проекта
+3. Получить **url webhook'а** для будущей установки скрипта на маке
+
+### 2. Mac
+
+```bash
 ./install.sh
 ```
 
 Установщик:
 - Скопирует бинарник в `/usr/local/bin/esconnect`
-- Запустит интерактивную настройку (`esconnect setup`)
-- Запустит демон
+- Предложит запустить интерактивную настройку (`esconnect setup`)
+- В процессе `setup` будет сгенерирован **Auth Token** — он понадобится на следующем шаге.
+- Вводим **url webhook'а**
+- Запустится демон
 
-В процессе `setup` будет сгенерирован **Auth Token** — он понадобится на следующем шаге.
+### 3. Телефон
 
-После установки выдать разрешения в **System Settings → Privacy & Security**:
+В макросе настроить два поля:
+   - **Шаг "PIN Unlock"** — вставить PIN своего телефона (или удалить шаг, если телефон без блокировки)
+   - **Шаг "HTTP Request" → заголовок `X-Auth-Token`** — вставить токен из `esconnect setup`
+
+Если используете VPN с раздельным туннелированием - добавьте macrodroid в исключения. Иначе отправка кодов работать не будет
+
+После установки можно заранее выдать разрешения в **System Settings → Privacy & Security**:
 
 | Разрешение       | Зачем                                        |
 |------------------|----------------------------------------------|
 | Accessibility    | Управление интерфейсом VPN через System Events |
 | Input Monitoring | Ввод OTP и пароля в поля VPN                  |
 
-### 2. Телефон
-
-1. Установить [MacroDroid](https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid)
-2. Импортировать файл `Indeed_Key_HTTP.macro` из этого репозитория
-3. В макросе настроить два поля:
-   - **Шаг "PIN Unlock"** — вставить PIN своего телефона (или удалить шаг, если телефон без блокировки)
-   - **Шаг "HTTP Request" → заголовок `X-Auth-Token`** — вставить токен из `esconnect setup`
-4. Включить макрос
+Если этого не сделать, скрипт сам запросит их при первой попытке подключения
 
 ---
 
@@ -54,7 +64,7 @@ cd esconnect
 ```bash
 esconnect connect      # Запросить OTP и подключиться
 esconnect disconnect   # Отключиться
-esconnect toggle       # Переключить состояние
+esconnect toggle       # Переключить состояние (для настроек горячих клавиш, например через raycast)
 esconnect status       # Статус VPN и демона
 esconnect setup        # Изменить настройки
 esconnect start        # Запустить демон
